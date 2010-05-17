@@ -341,7 +341,7 @@ module CouchRest
       more_subclasses = subclasses.map{|c| c.subclasses }.flatten
       while not more_subclasses.empty?
         subclasses += more_subclasses
-        more_subclasses.clear
+        more_subclasses = more_subclasses.map{|c| c.subclasses }.flatten
       end
       subclasses.each{|klass| klass.design_doc_fresh = false if klass.respond_to?(:design_doc_fresh=) }
     end
