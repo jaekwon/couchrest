@@ -240,10 +240,15 @@ module CouchRest
     # Returns a boolean value
     def save_without_callbacks(bulk = false)
       raise ArgumentError, "a document requires a database to be saved to (The document or the #{self.class} default database were not set)" unless database
-      set_unique_id if new? && self.respond_to?(:set_unique_id)
-      result = database.save_doc(self, bulk)
-      mark_as_saved 
-      result["ok"] == true
+      if self.new?
+        created = self.create(bulk)
+        mark_as_saved if created
+        return created ? true : false
+      else
+        result = database.save_doc(self, bulk)
+        mark_as_saved if result["ok"] == true
+        return result["ok"] == true
+      end
     end
     
     # Saves the document to the db using save. Raises an exception

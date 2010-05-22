@@ -163,6 +163,15 @@ describe "ExtendedDocument" do
       doc.run_before_save.should be_true
       doc.run_after_save.should be_true
     end
+
+    it "should trigger the create callbacks with .new/.save" do
+      doc = WithCallBacks.new(:name => 'my other test') 
+      doc.save
+      doc.run_before_create.should be_true
+      doc.run_after_create.should be_true
+      doc.run_before_save.should be_true
+      doc.run_after_save.should be_true
+    end
   end
   
   describe "update attributes without saving" do
