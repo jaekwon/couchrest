@@ -316,6 +316,7 @@ module CouchRest
     # DELETE the database itself. This is not undoable and could be rather
     # catastrophic. Use with care!
     def delete!
+      # TODO we don't need to clear all the docs.
       clear_extended_doc_fresh_cache
       CouchRest.delete @root
     end
@@ -336,7 +337,13 @@ module CouchRest
     end
     
     def clear_extended_doc_fresh_cache
-      ::CouchRest::ExtendedDocument.subclasses.each{|klass| klass.design_doc_fresh = false if klass.respond_to?(:design_doc_fresh=) }
+      subclasses = ::CouchRest::ExtendedDocument.subclasses
+      more_subclasses = subclasses.map{|c| c.subclasses }.flatten
+      while not more_subclasses.empty?
+        subclasses += more_subclasses
+        more_subclasses = more_subclasses.map{|c| c.subclasses }.flatten
+      end
+      subclasses.each{|klass| klass.design_doc_fresh = false if klass.respond_to?(:design_doc_fresh=) }
     end
 
     def uri_for_attachment(doc, name)

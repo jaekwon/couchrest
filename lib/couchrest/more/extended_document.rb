@@ -90,8 +90,8 @@ module CouchRest
         property(:created_at, :read_only => true, :type => 'Time', :auto_validation => false)
         
         set_callback :save, :before do |object|
-          object['updated_at'] = Time.now
-          object['created_at'] = object['updated_at'] if object.new?
+          object['updated_at'] ||= Time.now
+          object['created_at'] ||= object['updated_at'] if object.new?
         end
       EOS
     end
